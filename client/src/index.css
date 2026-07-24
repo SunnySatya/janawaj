@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --font-primary: 'Inter', sans-serif;
+  --font-heading: 'Playfair Display', serif;
+}
+
+body {
+  font-family: var(--font-primary);
+  @apply bg-gray-50 text-gray-900;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Swiper Custom Styles */
+.swiper-button-next,
+.swiper-button-prev {
+  @apply text-white bg-black/30 hover:bg-black/50 w-10 h-10 rounded-full backdrop-blur-sm transition-all duration-300;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 1.2rem !important;
+  font-weight: bold;
+}
+
+.swiper-pagination-bullet {
+  @apply bg-white/70 !important;
+}
+
+.swiper-pagination-bullet-active {
+  @apply bg-primary-500 !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* Animation Classes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-fade-in-up-delay {
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+

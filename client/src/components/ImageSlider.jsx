@@ -1,0 +1,243 @@
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaHeart,
+  FaShare,
+  FaBookmark,
+  FaRegHeart,
+  FaRegBookmark,
+  FaSpinner,
+} from "react-icons/fa";
+import { HiClock } from "react-icons/hi";
+
+const ImageSlider = () => {
+  const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    fetchSliders();
+  }, []);
+
+  const fetchSliders = async () => {
+    try {
+      const res = await axios.get("/api/sliders");
+      const apiSlides = res.data.data || [];
+      if (apiSlides.length > 0) {
+        setSlides(
+          apiSlides.map((slide) => ({
+            id: slide._id,
+            image: slide.image,
+            title: slide.title,
+            description: slide.description || "",
+            category: slide.category || "Featured",
+            date: slide.createdAt
+              ? new Date(slide.createdAt).toLocaleDateString()
+              : "Recent",
+            likes: 0,
+            shares: 0,
+            saved: false,
+            liked: false,
+          })),
+        );
+      } else {
+        // Fallback: show latest news as slider if no sliders exist
+        const newsRes = await axios.get("/api/news?limit=5&featured=true");
+        const news = newsRes.data.data || [];
+        if (news.length > 0) {
+          setSlides(
+            news.map((item) => ({
+              id: item._id,
+              image: item.image,
+              title: item.title,
+              description: item.description || "",
+              category: item.category || "Featured",
+              date: item.publishedAt
+                ? new Date(item.publishedAt).toLocaleDateString()
+                : "Recent",
+              likes: 0,
+              shares: 0,
+              saved: false,
+              liked: false,
+            })),
+          );
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load sliders:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAutoPlaying && slides.length > 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % slides.length);
+      }, 5000);
+    }
+    return () => clearInterval(intervalRef.current);
+  }, [isAutoPlaying, slides.length]);
+
+  const goToSlide = (index) => {
+    setCurrentIndex(index);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const goToPrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % slides.length);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const toggleLike = (id) => {
+    setSlides(
+      slides.map((slide) =>
+        slide.id === id
+          ? {
+              ...slide,
+              liked: !slide.liked,
+              likes: slide.liked ? slide.likes - 1 : slide.likes + 1,
+            }
+          : slide,
+      ),
+    );
+  };
+
+  const toggleSave = (id) => {
+    setSlides(
+      slides.map((slide) =>
+        slide.id === id ? { ...slide, saved: !slide.saved } : slide,
+      ),
+    );
+  };
+
+  if (loading) {
+    return (
+      <section className="relative w-full bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+          <div className="flex items-center justify-center h-64">
+            <FaSpinner className="w-8 h-8 text-primary-400 animate-spin" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (slides.length === 0) {
+    return null;
+  }
+
+  const currentSlide = slides[currentIndex];
+  return (
+    <section className="relative w-full bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        {/* Section Header */}
+        <div className="text-center mb-6 md:mb-10">
+          <div className="inline-block px-3 py-1 bg-primary-500/20 rounded-full text-primary-300 text-xs font-semibold uppercase tracking-wider mb-3">
+            Top Stories
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white font-[Playfair_Display]">
+            Your Platform Your Voice
+          </h2>
+          <p className="text-gray-400 mt-2 text-sm md:text-base max-w-2xl mx-auto">
+            Stay updated with the latest news and current events from around the
+            world
+          </p>
+        </div>
+
+        {/* Slider Container */}
+        <div className="relative group">
+          {/* Main Slide */}
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative aspect-[16/9] md:aspect-[21/9]">
+              <img
+                src={currentSlide.image}
+                alt={currentSlide.title}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+
+              {/* Content */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 lg:p-12">
+                <div className="max-w-3xl">
+                  {/* Category Badge */}
+                  <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full mb-2 md:mb-3 uppercase tracking-wider">
+                    {currentSlide.category}
+                  </span>
+
+                  {/* Title */}
+                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white font-[Playfair_Display] leading-tight mb-2 md:mb-3">
+                    {currentSlide.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-sm md:text-base text-gray-200 mb-3 md:mb-4 line-clamp-2 md:line-clamp-3">
+                    {currentSlide.description}
+                  </p>
+
+                  {/* Meta */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center space-x-4 text-xs md:text-sm text-gray-300">
+                      <span className="flex items-center space-x-1">
+                        <HiClock className="w-4 h-4" />
+                        <span>{currentSlide.date}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Arrows */}
+          <button
+            onClick={goToPrev}
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+            aria-label="Previous slide"
+          >
+            <FaChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+          <button
+            onClick={goToNext}
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+            aria-label="Next slide"
+          >
+            <FaChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+        </div>
+
+        {/* Dots Pagination */}
+        <div className="flex items-center justify-center mt-6 space-x-2">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.id}
+              onClick={() => goToSlide(index)}
+              className={`transition-all duration-300 rounded-full ${
+                index === currentIndex
+                  ? "w-8 h-2.5 bg-primary-500"
+                  : "w-2.5 h-2.5 bg-white/40 hover:bg-white/60"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default ImageSlider;

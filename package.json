@@ -1,0 +1,14 @@
+{
+  "name": "janawaj",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "install": "cd server && npm install",
+    "start": "cd server && npm start",
+    "build": "cd client && npm install && npm run build",
+    "dev": "cd server && npm run dev"
+  }
+}

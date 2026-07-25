@@ -102,12 +102,14 @@ export const AuthProvider = ({ children }) => {
 
   // Social Login (Google)
   const loginWithGoogle = () => {
-    window.location.href = "http://localhost:5000/api/auth/google";
+    const baseUrl = window.location.origin;
+    window.location.href = `${baseUrl}/api/auth/google`;
   };
 
   // Social Login (Facebook)
   const loginWithFacebook = () => {
-    window.location.href = "http://localhost:5000/api/auth/facebook";
+    const baseUrl = window.location.origin;
+    window.location.href = `${baseUrl}/api/auth/facebook`;
   };
 
   // Update user

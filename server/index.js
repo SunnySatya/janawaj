@@ -39,6 +39,7 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
+  "http://localhost:3001",
   "http://127.0.0.1:3000",
   process.env.CLIENT_URL,
 ].filter(Boolean);
@@ -46,11 +47,11 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (
-        !origin ||
-        allowedOrigins.includes(origin) ||
-        process.env.NODE_ENV !== "production"
-      ) {
+      // Allow all origins in production (Render) since the frontend is served by same server
+      if (!origin || process.env.NODE_ENV === "production") {
+        return callback(null, true);
+      }
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
       callback(null, true);

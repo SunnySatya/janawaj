@@ -2,12 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
-const cookieParser = require("cookie-parser");
 const path = require("path");
 const fs = require("fs");
-// Try loading .env from server directory first, then root
-require("dotenv").config({ path: path.join(__dirname, ".env") });
-require("dotenv").config(); // fallback to root .env
+require("dotenv").config();
 
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
@@ -65,7 +62,6 @@ app.use(
   }),
 );
 app.use(morgan("dev"));
-app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 

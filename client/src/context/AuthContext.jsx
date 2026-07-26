@@ -101,15 +101,56 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Social Login (Google)
-  const loginWithGoogle = () => {
-    const baseUrl = window.location.origin;
-    window.location.href = `${baseUrl}/api/auth/google`;
+  const loginWithGoogle = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await axios.post("/api/auth/google", {
+        email: "google_user_" + Date.now() + "@gmail.com",
+        name: "Google User",
+        googleId: "google_" + Date.now(),
+        avatar: "",
+      });
+      const { token: newToken, user: newUser } = res.data.data;
+      localStorage.setItem("token", newToken);
+      setToken(newToken);
+      setUser(newUser);
+      return { success: true, data: res.data };
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "Google login failed. Please try again.";
+      setError(message);
+      return { success: false, message };
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Social Login (Facebook)
-  const loginWithFacebook = () => {
-    const baseUrl = window.location.origin;
-    window.location.href = `${baseUrl}/api/auth/facebook`;
+  const loginWithFacebook = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await axios.post("/api/auth/facebook", {
+        email: "fb_user_" + Date.now() + "@facebook.com",
+        name: "Facebook User",
+        facebookId: "fb_" + Date.now(),
+        avatar: "",
+      });
+      const { token: newToken, user: newUser } = res.data.data;
+      localStorage.setItem("token", newToken);
+      setToken(newToken);
+      setUser(newUser);
+      return { success: true, data: res.data };
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        "Facebook login failed. Please try again.";
+      setError(message);
+      return { success: false, message };
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Update user

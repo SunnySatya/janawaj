@@ -41,3 +41,23 @@
 - [ ] Add `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` to Render dashboard
 - [ ] Redeploy on Render
 - [ ] Re-upload images for existing news via admin panel (old `/uploads/...` entries will show fallback placeholder)
+
+---
+
+# Fix: Featured News Card Style Matches News Card
+
+## Steps
+
+- [x] 1. Analyze `NewsCard.jsx` — featured cards used full-bleed image + gradient overlay style
+- [x] 2. Update featured card rendering to use same white-card layout as regular news card (image on top, content below)
+- [x] 3. Verify client builds
+
+---
+
+# Fix: Image Slider Style Matches News Card
+
+## Steps
+
+- [x] 1. Analyze `ImageSlider.jsx` — slider used full-bleed image + gradient overlay style
+- [x] 2. Update slider slide to use same white-card layout as news card (image on top, content below, category badge overlay)
+- [x] 3. Verify client builds

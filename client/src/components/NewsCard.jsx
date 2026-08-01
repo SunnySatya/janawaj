@@ -10,6 +10,7 @@ import {
   FaRegBookmark,
 } from "react-icons/fa";
 import { HiClock } from "react-icons/hi";
+import { handleImageError } from "../utils/imageFallback";
 
 const NewsCard = ({ news, featured }) => {
   const { user, isAuthenticated } = useAuth();
@@ -75,6 +76,7 @@ const NewsCard = ({ news, featured }) => {
             src={news.image}
             alt={news.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            onError={handleImageError}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -126,6 +128,7 @@ const NewsCard = ({ news, featured }) => {
           src={news.image}
           alt={news.title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+          onError={handleImageError}
         />
         <div className="absolute top-3 left-3">
           <span className="px-2.5 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full uppercase tracking-wider">

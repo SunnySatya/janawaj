@@ -258,15 +258,18 @@ npm run build   # Installs client deps and builds the Vite bundle
 
 ## 🔐 Environment Variables
 
-| Variable                | Location    | Description                   |
-| ----------------------- | ----------- | ----------------------------- |
-| `PORT`                  | server/.env | Backend port (default: 5000)  |
-| `NODE_ENV`              | server/.env | `development` or `production` |
-| `MONGODB_URI`           | server/.env | MongoDB connection string     |
-| `JWT_SECRET`            | server/.env | Secret key for signing JWTs   |
-| `JWT_EXPIRE`            | server/.env | Token expiry (default: 7d)    |
-| `CLIENT_URL`            | server/.env | Allowed CORS origin           |
-| `VITE_GOOGLE_CLIENT_ID` | client/.env | Google OAuth client ID        |
+| Variable                | Location    | Description                                      |
+| ----------------------- | ----------- | ------------------------------------------------ |
+| `PORT`                  | server/.env | Backend port (default: 5000)                     |
+| `NODE_ENV`              | server/.env | `development` or `production`                    |
+| `MONGODB_URI`           | server/.env | MongoDB connection string                        |
+| `JWT_SECRET`            | server/.env | Secret key for signing JWTs                      |
+| `JWT_EXPIRE`            | server/.env | Token expiry (default: 7d)                       |
+| `CLIENT_URL`            | server/.env | Allowed CORS origin                              |
+| `VITE_GOOGLE_CLIENT_ID` | client/.env | Google OAuth client ID                           |
+| `CLOUDINARY_CLOUD_NAME` | server/.env | Cloudinary cloud name (production image storage) |
+| `CLOUDINARY_API_KEY`    | server/.env | Cloudinary API key                               |
+| `CLOUDINARY_API_SECRET` | server/.env | Cloudinary API secret                            |
 
 ---
 
@@ -407,13 +410,16 @@ Protected by JWT + role-based authorization (`authorize("admin")`). Accessible a
 
 4. Set the following environment variables in Render:
 
-   | Variable      | Value                                                      |
-   | ------------- | ---------------------------------------------------------- |
-   | `NODE_ENV`    | `production`                                               |
-   | `MONGODB_URI` | Your MongoDB Atlas connection string                       |
-   | `JWT_SECRET`  | A strong random secret                                     |
-   | `JWT_EXPIRE`  | `7d`                                                       |
-   | `CLIENT_URL`  | Your Render app URL (e.g., `https://janawaj.onrender.com`) |
+   | Variable                | Value                                                      |
+   | ----------------------- | ---------------------------------------------------------- |
+   | `NODE_ENV`              | `production`                                               |
+   | `MONGODB_URI`           | Your MongoDB Atlas connection string                       |
+   | `JWT_SECRET`            | A strong random secret                                     |
+   | `JWT_EXPIRE`            | `7d`                                                       |
+   | `CLIENT_URL`            | Your Render app URL (e.g., `https://janawaj.onrender.com`) |
+   | `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name (from Cloudinary dashboard)     |
+   | `CLOUDINARY_API_KEY`    | Your Cloudinary API key                                    |
+   | `CLOUDINARY_API_SECRET` | Your Cloudinary API secret                                 |
 
 5. Deploy! 🚀
 

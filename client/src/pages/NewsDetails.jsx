@@ -16,6 +16,7 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import { HiClock } from "react-icons/hi";
+import { handleImageError } from "../utils/imageFallback";
 
 const NewsDetails = () => {
   const { id } = useParams();
@@ -190,6 +191,7 @@ const NewsDetails = () => {
           src={news.image}
           alt={news.title}
           className="w-full h-full object-cover"
+          onError={handleImageError}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
       </div>
@@ -363,6 +365,7 @@ const NewsDetails = () => {
                       src={item.image}
                       alt={item.title}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      onError={handleImageError}
                     />
                   </div>
                   <div className="p-4">

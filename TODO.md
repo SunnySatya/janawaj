@@ -54,6 +54,27 @@
 
 ---
 
+# Fix: Google Login Not Working
+
+## Root Cause
+
+- `AuthContext.loginWithGoogle` did NOT return the result → after successful Google auth, Login/Signup pages never received `success: true` so `navigate("/")` never ran — user stayed stuck on login page.
+- Google Identity Services (GIS) script was only loaded _after_ button click via `await` — this broke the user gesture so the popup could be blocked by popup blockers.
+- CSP (added earlier for images) did not include `frame-src` for Google domains → Google OAuth popup/iframe could be blocked in production.
+
+## Steps
+
+- [x] 1. Analyze Google login flow (client hook, AuthContext, backend route, .env config)
+- [x] 2. Test backend `/api/auth/google` → responds correctly (400 on invalid payload = route working)
+- [x] 3. Verify `VITE_GOOGLE_CLIENT_ID` is set and valid format
+- [x] 4. Fix `AuthContext.loginWithGoogle` to return `{ success, user, token }`
+- [x] 5. Preload GIS script on mount in `useSocialAuth` (prevents popup blocker) + add `prompt: "select_account"`
+- [x] 6. Add `frame-src` for Google domains in server CSP
+- [x] 7. Verify client build + server syntax
+- [x] 8. Commit `d63609c` + push to master (auto-deploy to Render)
+
+---
+
 # Fix: Image Slider Style Matches News Card
 
 ## Steps

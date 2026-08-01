@@ -4,37 +4,26 @@ import { useAuth } from "../context/AuthContext";
 import {
   FaNewspaper,
   FaUserPlus,
-  FaUser,
   FaEnvelope,
   FaLock,
+  FaUser,
   FaEye,
   FaEyeSlash,
   FaGoogle,
-  FaFacebook,
-  FaCheckCircle,
   FaSpinner,
   FaExclamationCircle,
-  FaCheckCircle as FaCheckCircleSolid,
 } from "react-icons/fa";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const {
-    register,
-    loginWithGoogle,
-    loginWithFacebook,
-    error,
-    setError,
-    loading,
-  } = useAuth();
+  const { register, loginWithGoogle, error, setError, loading, socialLoading } =
+    useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    agreeToTerms: false,
+    agree: false,
   });
   const [localLoading, setLocalLoading] = useState(false);
 
@@ -49,12 +38,8 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    if (!formData.agreeToTerms) {
-      setError("You must agree to the Terms of Service");
+    if (!formData.agree) {
+      setError("Please agree to the Terms of Service and Privacy Policy");
       return;
     }
     setLocalLoading(true);
@@ -69,37 +54,28 @@ const Signup = () => {
     }
   };
 
-  const passwordRequirements = [
-    { text: "At least 8 characters", met: formData.password.length >= 8 },
-    { text: "Contains a number", met: /\d/.test(formData.password) },
-    {
-      text: "Contains a special character",
-      met: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password),
-    },
-    { text: "Contains uppercase letter", met: /[A-Z]/.test(formData.password) },
-  ];
+  const isSubmitting = localLoading || loading || !!socialLoading;
 
-  const passwordsMatch =
-    formData.password === formData.confirmPassword &&
-    formData.confirmPassword !== "";
-
-  const isSubmitting = localLoading || loading;
+  const handleGoogleLogin = async () => {
+    const result = await loginWithGoogle();
+    if (result?.success) {
+      navigate("/");
+    }
+  };
 
   return (
     <div className="min-h-screen pt-16 md:pt-20 bg-gradient-to-br from-primary-50 via-white to-blue-50">
       <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <div className="w-full max-w-2xl">
+        <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-2xl mb-4 shadow-lg">
               <FaNewspaper className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 font-[Playfair_Display]">
-              Create Your Account
+              Create Account
             </h2>
-            <p className="text-gray-500 mt-2">
-              Join Janawaj and stay informed with the latest news
-            </p>
+            <p className="text-gray-500 mt-2">Join Janawaj and stay informed</p>
           </div>
 
           {/* Signup Form */}
@@ -113,181 +89,108 @@ const Signup = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Full Name */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <FaUser className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      placeholder="John Doe"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200 bg-gray-50/50"
-                      required
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="you@example.com"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200 bg-gray-50/50"
-                      required
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                </div>
-
-                {/* Password */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      placeholder="Create a password"
-                      className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200 bg-gray-50/50"
-                      required
-                      disabled={isSubmitting}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                      disabled={isSubmitting}
-                    >
-                      {showPassword ? (
-                        <FaEyeSlash className="w-4 h-4" />
-                      ) : (
-                        <FaEye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Confirm Password */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Confirm Password
-                  </label>
-                  <div className="relative">
-                    <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      placeholder="Confirm your password"
-                      className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200 bg-gray-50/50 ${
-                        formData.confirmPassword && !passwordsMatch
-                          ? "border-red-300"
-                          : formData.confirmPassword && passwordsMatch
-                            ? "border-green-300"
-                            : "border-gray-200"
-                      }`}
-                      required
-                      disabled={isSubmitting}
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors`}
-                      disabled={isSubmitting}
-                    >
-                      {showConfirmPassword ? (
-                        <FaEyeSlash className="w-4 h-4" />
-                      ) : (
-                        <FaEye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                  {formData.confirmPassword && !passwordsMatch && (
-                    <p className="text-xs text-red-500 mt-1">
-                      Passwords do not match
-                    </p>
-                  )}
-                  {formData.confirmPassword && passwordsMatch && (
-                    <p className="text-xs text-green-500 mt-1">
-                      Passwords match
-                    </p>
-                  )}
+              {/* Full Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <FaUser className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    placeholder="Your full name"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200 bg-gray-50/50"
+                    required
+                    disabled={isSubmitting}
+                  />
                 </div>
               </div>
 
-              {/* Password Requirements */}
-              {formData.password && (
-                <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
-                  <p className="text-xs font-medium text-gray-600 mb-2">
-                    Password Requirements:
-                  </p>
-                  {passwordRequirements.map((req, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <FaCheckCircle
-                        className={`w-3 h-3 ${req.met ? "text-green-500" : "text-gray-300"}`}
-                      />
-                      <span
-                        className={`text-xs ${req.met ? "text-green-600" : "text-gray-500"}`}
-                      >
-                        {req.text}
-                      </span>
-                    </div>
-                  ))}
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="you@example.com"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200 bg-gray-50/50"
+                    required
+                    disabled={isSubmitting}
+                  />
                 </div>
-              )}
+              </div>
 
-              {/* Terms & Conditions */}
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Create a strong password"
+                    className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200 bg-gray-50/50"
+                    required
+                    minLength={6}
+                    disabled={isSubmitting}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    disabled={isSubmitting}
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="w-4 h-4" />
+                    ) : (
+                      <FaEye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Agree to Terms */}
               <div className="flex items-start">
                 <input
                   type="checkbox"
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
+                  name="agree"
+                  checked={formData.agree}
                   onChange={handleChange}
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer mt-0.5"
-                  id="agreeToTerms"
-                  required
+                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer mt-1"
+                  id="agree"
                   disabled={isSubmitting}
                 />
                 <label
-                  htmlFor="agreeToTerms"
+                  htmlFor="agree"
                   className="ml-2 text-sm text-gray-600 cursor-pointer"
                 >
                   I agree to the{" "}
-                  <a
-                    href="#"
+                  <Link
+                    to="/terms-of-service"
                     className="text-primary-600 hover:text-primary-700 font-medium"
                   >
                     Terms of Service
-                  </a>{" "}
+                  </Link>{" "}
                   and{" "}
-                  <a
-                    href="#"
+                  <Link
+                    to="/privacy-policy"
                     className="text-primary-600 hover:text-primary-700 font-medium"
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </label>
               </div>
 
@@ -318,32 +221,26 @@ const Signup = () => {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-white text-gray-500">
-                  Or sign up with
+                  Or continue with
                 </span>
               </div>
             </div>
 
-            {/* Social Signup */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={loginWithGoogle}
-                disabled={isSubmitting}
-                className="flex items-center justify-center space-x-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 text-sm font-medium text-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
+            {/* Social Login */}
+            <button
+              onClick={handleGoogleLogin}
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 text-sm font-medium text-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {socialLoading === "google" ? (
+                <FaSpinner className="w-4 h-4 animate-spin text-red-500" />
+              ) : (
                 <FaGoogle className="w-4 h-4 text-red-500" />
-                <span>Google</span>
-              </button>
-              <button
-                onClick={loginWithFacebook}
-                disabled={isSubmitting}
-                className="flex items-center justify-center space-x-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 text-sm font-medium text-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <FaFacebook className="w-4 h-4 text-blue-600" />
-                <span>Facebook</span>
-              </button>
-            </div>
+              )}
+              <span>Sign up with Google</span>
+            </button>
 
-            {/* Login Link */}
+            {/* Sign In Link */}
             <p className="mt-6 text-center text-sm text-gray-500">
               Already have an account?{" "}
               <Link

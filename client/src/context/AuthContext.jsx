@@ -1,5 +1,12 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 import axios from "axios";
+import useSocialAuth from "../hooks/useSocialAuth";
 
 const AuthContext = createContext(null);
 
@@ -16,6 +23,14 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Social auth hook
+  const {
+    loginWithGoogle: socialLoginGoogle,
+    socialLoading,
+    socialError,
+    setSocialError,
+  } = useSocialAuth();
 
   // Set axios default header
   useEffect(() => {
@@ -100,17 +115,16 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common["Authorization"];
   };
 
-  // Social Login (Google)
-  const loginWithGoogle = () => {
-    const baseUrl = window.location.origin;
-    window.location.href = `${baseUrl}/api/auth/google`;
-  };
-
-  // Social Login (Facebook)
-  const loginWithFacebook = () => {
-    const baseUrl = window.location.origin;
-    window.location.href = `${baseUrl}/api/auth/facebook`;
-  };
+  // Social Login (Google) - uses client-side OAuth
+  const loginWithGoogle = useCallback(async () => {
+    const result = await socialLoginGoogle();
+    if (result.success) {
+      setToken(result.token);
+      setUser(result.user);
+    } else {
+      setError(result.message);
+    }
+  }, [socialLoginGoogle]);
 
   // Update user
   const updateUser = (updatedUser) => {
@@ -129,9 +143,9 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         loginWithGoogle,
-        loginWithFacebook,
         updateUser,
         isAuthenticated: !!user,
+        socialLoading,
       }}
     >
       {children}

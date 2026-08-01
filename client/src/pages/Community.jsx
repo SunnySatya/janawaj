@@ -162,7 +162,7 @@ const Community = () => {
   return (
     <div className="pt-16 md:pt-20 min-h-screen bg-gray-50">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-700 py-12 md:py-16">
+      <section className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-700 py-8 md:py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white/15 rounded-2xl mb-4 backdrop-blur-sm">
             <FaComments className="w-8 h-8 text-white" />

@@ -79,11 +79,7 @@ const About = () => {
   const stats = [
     { value: "100%", label: "Independent", sublabel: "No external influence" },
     { value: "24/7", label: "People-Powered", sublabel: "Run by citizens" },
-    {
-      value: "742+",
-      label: "Stories Covered",
-      sublabel: "Nation's key issues",
-    },
+    { value: "742", label: "Stories Covered", sublabel: "Nation's key issues" },
     { value: "21,000+", label: "Active Voices", sublabel: "Citizens engaged" },
   ];
 
@@ -97,7 +93,7 @@ const About = () => {
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-primary-300 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 lg:py-20">
           <div className="text-center max-w-4xl mx-auto">
             <span className="inline-block px-4 py-1.5 bg-white/15 text-white text-xs font-semibold rounded-full uppercase tracking-wider mb-4 backdrop-blur-sm border border-white/10">
               About Us

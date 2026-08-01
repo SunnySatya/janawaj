@@ -3,7 +3,8 @@ import axios from "axios";
 import { FaChevronLeft, FaChevronRight, FaSpinner } from "react-icons/fa";
 import { HiClock } from "react-icons/hi";
 
-const DEFAULT_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect fill='%231f2937' width='800' height='450'/%3E%3Ctext fill='%236b7280' font-family='Arial' font-size='24' x='400' y='225' text-anchor='middle' dominant-baseline='middle'%3EImage not available%3C/text%3E%3C/svg%3E";
+const DEFAULT_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect fill='%231f2937' width='800' height='450'/%3E%3Ctext fill='%236b7280' font-family='Arial' font-size='24' x='400' y='225' text-anchor='middle' dominant-baseline='middle'%3EImage not available%3C/text%3E%3C/svg%3E";
 
 const ImageSlider = () => {
   const [slides, setSlides] = useState([]);
@@ -129,15 +130,16 @@ const ImageSlider = () => {
             Your Platform Your Voice
           </h2>
           <p className="text-gray-400 mt-2 text-sm md:text-base max-w-2xl mx-auto">
-            Stay updated with the latest news and current events from around the world
+            Stay updated with the latest news and current events from around the
+            world
           </p>
         </div>
 
         {/* Slider Container */}
         <div className="relative group">
           {/* Main Slide */}
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-            <div className="relative aspect-[16/9] md:aspect-[21/9]">
+          <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100">
+            <div className="relative overflow-hidden aspect-[16/9] md:aspect-[21/9]">
               <img
                 src={currentSlide.image}
                 alt={currentSlide.title}
@@ -145,38 +147,32 @@ const ImageSlider = () => {
                 fetchpriority="high"
                 onError={handleImageError}
               />
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+              {/* Category Badge */}
+              <div className="absolute top-3 left-3">
+                <span className="px-2.5 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full uppercase tracking-wider">
+                  {currentSlide.category}
+                </span>
+              </div>
+            </div>
 
-              {/* Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 lg:p-12">
-                <div className="max-w-3xl">
-                  {/* Category Badge */}
-                  <span className="inline-block px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full mb-2 md:mb-3 uppercase tracking-wider">
-                    {currentSlide.category}
-                  </span>
+            {/* Content */}
+            <div className="p-4 md:p-6">
+              {/* Title */}
+              <h3 className="font-bold text-gray-900 font-[Playfair_Display] leading-tight mb-2 group-hover:text-primary-600 transition-colors line-clamp-2 text-lg md:text-2xl">
+                {currentSlide.title}
+              </h3>
 
-                  {/* Title */}
-                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white font-[Playfair_Display] leading-tight mb-2 md:mb-3">
-                    {currentSlide.title}
-                  </h3>
+              {/* Description */}
+              <p className="text-sm text-gray-500 line-clamp-2 mb-3">
+                {currentSlide.description}
+              </p>
 
-                  {/* Description */}
-                  <p className="text-sm md:text-base text-gray-200 mb-3 md:mb-4 line-clamp-2 md:line-clamp-3">
-                    {currentSlide.description}
-                  </p>
-
-                  {/* Meta */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center space-x-4 text-xs md:text-sm text-gray-300">
-                      <span className="flex items-center space-x-1">
-                        <HiClock className="w-4 h-4" />
-                        <span>{currentSlide.date}</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
+              {/* Meta */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-400 flex items-center space-x-1">
+                  <HiClock className="w-3.5 h-3.5" />
+                  <span>{currentSlide.date}</span>
+                </span>
               </div>
             </div>
           </div>

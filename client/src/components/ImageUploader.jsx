@@ -6,6 +6,7 @@ import {
   FaTimes,
   FaImage,
   FaCheck,
+  FaExchangeAlt,
 } from "react-icons/fa";
 
 const ImageUploader = ({
@@ -19,6 +20,8 @@ const ImageUploader = ({
   const [uploadError, setUploadError] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
+  // Drag counter to eliminate flicker caused by child elements
+  const dragDepth = useRef(0);
 
   const handleFileSelect = async (file) => {
     if (!file) return;
@@ -78,19 +81,39 @@ const ImageUploader = ({
 
   const handleDrop = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    dragDepth.current = 0;
     setDragOver(false);
     const file = e.dataTransfer.files[0];
     handleFileSelect(file);
   };
 
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragDepth.current += 1;
+    setDragOver(true);
+  };
+
   const handleDragOver = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    // Required so the browser treats the element as a valid drop target
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = "copy";
+    }
     setDragOver(true);
   };
 
   const handleDragLeave = (e) => {
     e.preventDefault();
-    setDragOver(false);
+    e.stopPropagation();
+    dragDepth.current -= 1;
+    // Only remove highlight when we've left all nested elements
+    if (dragDepth.current <= 0) {
+      dragDepth.current = 0;
+      setDragOver(false);
+    }
   };
 
   const handleRemove = () => {
@@ -111,9 +134,23 @@ const ImageUploader = ({
         {label} {!value && <span className="text-red-500">*</span>}
       </label>
 
-      {/* Preview */}
-      {preview && (
-        <div className="relative w-full h-40 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 mb-2">
+      {/* Upload Drop Zone (always visible — supports drag & drop to replace) */}
+      <div
+        onDrop={handleDrop}
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onClick={() => !uploading && fileInputRef.current?.click()}
+        className={`relative w-full border-2 border-dashed rounded-lg overflow-hidden transition-all ${
+          dragOver
+            ? "border-primary-500 bg-primary-50"
+            : preview
+              ? "border-gray-300 hover:border-primary-400 hover:bg-gray-50"
+              : "border-gray-300 hover:border-primary-400 hover:bg-gray-50"
+        } ${preview ? "h-48" : "p-6 text-center cursor-pointer"}`}
+      >
+        {/* Preview image */}
+        {preview && (
           <img
             src={preview}
             alt="Preview"
@@ -129,29 +166,15 @@ const ImageUploader = ({
               `;
             }}
           />
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-md"
-            title="Remove image"
-          >
-            <FaTimes className="w-3 h-3" />
-          </button>
-        </div>
-      )}
+        )}
 
-      {/* Upload Drop Zone */}
-      {!preview && (
+        {/* Overlay content */}
         <div
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => fileInputRef.current?.click()}
-          className={`relative w-full border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
-            dragOver
-              ? "border-primary-500 bg-primary-50"
-              : "border-gray-300 hover:border-primary-400 hover:bg-gray-50"
-          }`}
+          className={`${
+            preview
+              ? "absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+              : "flex flex-col items-center justify-center"
+          } ${uploading ? "pointer-events-none" : ""}`}
         >
           {uploading ? (
             <div className="flex flex-col items-center space-y-2">
@@ -160,27 +183,63 @@ const ImageUploader = ({
             </div>
           ) : (
             <div className="flex flex-col items-center space-y-2">
-              <FaCloudUploadAlt className="w-10 h-10 text-gray-400" />
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Click or drag & drop to upload
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  JPEG, PNG, GIF, WebP, SVG (max 5MB)
-                </p>
-              </div>
+              {preview ? (
+                <>
+                  <FaExchangeAlt className="w-8 h-8" />
+                  <p className="text-sm font-medium">
+                    Click or drag & drop to replace
+                  </p>
+                </>
+              ) : (
+                <>
+                  <FaCloudUploadAlt className="w-10 h-10 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">
+                      Click or drag & drop to upload
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      JPEG, PNG, GIF, WebP, SVG (max 5MB)
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"
-            onChange={handleFileInput}
-            className="hidden"
-            disabled={uploading}
-          />
         </div>
-      )}
+
+        {/* Remove button */}
+        {preview && !uploading && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemove();
+            }}
+            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-md z-10"
+            title="Remove image"
+          >
+            <FaTimes className="w-3 h-3" />
+          </button>
+        )}
+
+        {/* Drag-over highlight */}
+        {dragOver && (
+          <div className="absolute inset-0 bg-primary-500/30 z-20 flex items-center justify-center pointer-events-none">
+            <span className="px-4 py-2 bg-white text-primary-600 text-sm font-semibold rounded-lg shadow">
+              Drop to upload
+            </span>
+          </div>
+        )}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"
+          onChange={handleFileInput}
+          className="hidden"
+          disabled={uploading}
+        />
+      </div>
 
       {/* Or paste URL */}
       <div className="flex items-center space-x-2">

@@ -121,8 +121,11 @@ export const AuthProvider = ({ children }) => {
     if (result.success) {
       setToken(result.token);
       setUser(result.user);
+      setError(null);
+      return { success: true, user: result.user, token: result.token };
     } else {
       setError(result.message);
+      return { success: false, message: result.message };
     }
   }, [socialLoginGoogle]);
 

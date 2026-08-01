@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import axios from "axios";
 
 /**
@@ -10,6 +10,26 @@ const useSocialAuth = () => {
   const [socialLoading, setSocialLoading] = useState(null); // 'google' | null
   const [socialError, setSocialError] = useState(null);
   const gsiScriptLoaded = useRef(false);
+
+  // Preload the Google Identity Services script on mount so that by the time
+  // the user clicks "Sign in with Google", the script is already loaded and
+  // the popup opens within the user gesture (prevents popup blockers).
+  useEffect(() => {
+    if (window.google?.accounts || gsiScriptLoaded.current) {
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      gsiScriptLoaded.current = true;
+    };
+    script.onerror = () => {
+      console.error("Failed to preload Google Identity Services");
+    };
+    document.body.appendChild(script);
+  }, []);
 
   /**
    * Dynamically load Google Identity Services script
@@ -85,6 +105,7 @@ const useSocialAuth = () => {
         const client = window.google.accounts.oauth2.initTokenClient({
           client_id: GOOGLE_CLIENT_ID,
           scope: "email profile openid",
+          prompt: "select_account",
           callback: (response) => {
             clearTimeout(timeout);
             if (response.access_token) {

@@ -48,6 +48,12 @@ app.use(
         "style-src": ["'self'", "https:", "'unsafe-inline'"],
         "font-src": ["'self'", "https:", "data:"],
         "connect-src": ["'self'", "https:", "http:"],
+        "frame-src": [
+          "'self'",
+          "https://accounts.google.com",
+          "https://accounts.youtube.com",
+          "https://apis.google.com",
+        ],
       },
     },
   }),

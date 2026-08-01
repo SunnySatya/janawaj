@@ -37,10 +37,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    facebookId: {
-      type: String,
-      default: null,
-    },
     isActive: {
       type: Boolean,
       default: true,

@@ -185,7 +185,7 @@ const NewsDetails = () => {
   return (
     <div className="pt-16 md:pt-20">
       {/* Hero Image */}
-      <div className="relative h-[40vh] md:h-[60vh] overflow-hidden">
+      <div className="relative h-[25vh] md:h-[35vh] overflow-hidden">
         <img
           src={news.image}
           alt={news.title}

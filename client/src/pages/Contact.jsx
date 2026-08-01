@@ -67,14 +67,14 @@ const Contact = () => {
     {
       icon: <FaClock className="w-6 h-6" />,
       title: "Working Hours",
-      details: ["Everyday: 9:00 AM - 6:00 PM", "Sat: 10:00 AM - 4:00 PM"],
+      details: ["24×7 Customer Support"],
     },
   ];
 
   return (
     <div className="pt-16 md:pt-20">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-primary-900 to-primary-700 py-16 md:py-24">
+      <section className="relative bg-gradient-to-r from-primary-900 to-primary-700 py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl md:text-5xl font-bold text-white font-[Playfair_Display] mb-4">
             Get In Touch

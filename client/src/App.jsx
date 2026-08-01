@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -11,6 +12,8 @@ import Community from "./pages/Community";
 import Contact from "./pages/Contact";
 import Polls from "./pages/Polls";
 import NewsDetails from "./pages/NewsDetails";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminNews from "./pages/admin/AdminNews";
@@ -51,6 +54,8 @@ const AppRoutes = () => {
       <Route path="/contact" element={<Contact />} />
       <Route path="/polls" element={<Polls />} />
       <Route path="/news/:id" element={<NewsDetails />} />
+      <Route path="/terms-of-service" element={<TermsOfService />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
       {/* Admin Routes */}
       <Route
@@ -79,6 +84,7 @@ const App = () => {
 
   return (
     <AuthProvider>
+      <ScrollToTop />
       <div className="min-h-screen flex flex-col">
         {!isAdminRoute && <Navbar />}
         <main className={`flex-grow ${isAdminRoute ? "p-0" : ""}`}>

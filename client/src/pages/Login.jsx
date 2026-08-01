@@ -9,21 +9,14 @@ import {
   FaEye,
   FaEyeSlash,
   FaGoogle,
-  FaFacebook,
   FaSpinner,
   FaExclamationCircle,
 } from "react-icons/fa";
 
 const Login = () => {
   const navigate = useNavigate();
-  const {
-    login,
-    loginWithGoogle,
-    loginWithFacebook,
-    error,
-    setError,
-    loading,
-  } = useAuth();
+  const { login, loginWithGoogle, error, setError, loading, socialLoading } =
+    useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -56,7 +49,14 @@ const Login = () => {
     }
   };
 
-  const isSubmitting = localLoading || loading;
+  const isSubmitting = localLoading || loading || !!socialLoading;
+
+  const handleGoogleLogin = async () => {
+    const result = await loginWithGoogle();
+    if (result?.success) {
+      navigate("/");
+    }
+  };
 
   return (
     <div className="min-h-screen pt-16 md:pt-20 bg-gradient-to-br from-primary-50 via-white to-blue-50">
@@ -198,24 +198,18 @@ const Login = () => {
             </div>
 
             {/* Social Login */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={loginWithGoogle}
-                disabled={isSubmitting}
-                className="flex items-center justify-center space-x-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 text-sm font-medium text-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
+            <button
+              onClick={handleGoogleLogin}
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 text-sm font-medium text-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {socialLoading === "google" ? (
+                <FaSpinner className="w-4 h-4 animate-spin text-red-500" />
+              ) : (
                 <FaGoogle className="w-4 h-4 text-red-500" />
-                <span>Google</span>
-              </button>
-              <button
-                onClick={loginWithFacebook}
-                disabled={isSubmitting}
-                className="flex items-center justify-center space-x-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 text-sm font-medium text-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <FaFacebook className="w-4 h-4 text-blue-600" />
-                <span>Facebook</span>
-              </button>
-            </div>
+              )}
+              <span>Sign in with Google</span>
+            </button>
 
             {/* Sign Up Link */}
             <p className="mt-6 text-center text-sm text-gray-500">

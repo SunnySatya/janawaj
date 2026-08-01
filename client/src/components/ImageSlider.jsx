@@ -1,16 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import {
-  FaChevronLeft,
-  FaChevronRight,
-  FaHeart,
-  FaShare,
-  FaBookmark,
-  FaRegHeart,
-  FaRegBookmark,
-  FaSpinner,
-} from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaSpinner } from "react-icons/fa";
 import { HiClock } from "react-icons/hi";
+
+const DEFAULT_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect fill='%231f2937' width='800' height='450'/%3E%3Ctext fill='%236b7280' font-family='Arial' font-size='24' x='400' y='225' text-anchor='middle' dominant-baseline='middle'%3EImage not available%3C/text%3E%3C/svg%3E";
 
 const ImageSlider = () => {
   const [slides, setSlides] = useState([]);
@@ -38,14 +31,9 @@ const ImageSlider = () => {
             date: slide.createdAt
               ? new Date(slide.createdAt).toLocaleDateString()
               : "Recent",
-            likes: 0,
-            shares: 0,
-            saved: false,
-            liked: false,
           })),
         );
       } else {
-        // Fallback: show latest news as slider if no sliders exist
         const newsRes = await axios.get("/api/news?limit=5&featured=true");
         const news = newsRes.data.data || [];
         if (news.length > 0) {
@@ -59,10 +47,6 @@ const ImageSlider = () => {
               date: item.publishedAt
                 ? new Date(item.publishedAt).toLocaleDateString()
                 : "Recent",
-              likes: 0,
-              shares: 0,
-              saved: false,
-              liked: false,
             })),
           );
         }
@@ -73,6 +57,16 @@ const ImageSlider = () => {
       setLoading(false);
     }
   };
+
+  // Preload all slider images for instant transitions
+  useEffect(() => {
+    if (slides.length > 0) {
+      slides.forEach((slide) => {
+        const img = new Image();
+        img.src = slide.image;
+      });
+    }
+  }, [slides]);
 
   useEffect(() => {
     if (isAutoPlaying && slides.length > 1) {
@@ -101,26 +95,9 @@ const ImageSlider = () => {
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
-  const toggleLike = (id) => {
-    setSlides(
-      slides.map((slide) =>
-        slide.id === id
-          ? {
-              ...slide,
-              liked: !slide.liked,
-              likes: slide.liked ? slide.likes - 1 : slide.likes + 1,
-            }
-          : slide,
-      ),
-    );
-  };
-
-  const toggleSave = (id) => {
-    setSlides(
-      slides.map((slide) =>
-        slide.id === id ? { ...slide, saved: !slide.saved } : slide,
-      ),
-    );
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = DEFAULT_IMAGE;
   };
 
   if (loading) {
@@ -152,8 +129,7 @@ const ImageSlider = () => {
             Your Platform Your Voice
           </h2>
           <p className="text-gray-400 mt-2 text-sm md:text-base max-w-2xl mx-auto">
-            Stay updated with the latest news and current events from around the
-            world
+            Stay updated with the latest news and current events from around the world
           </p>
         </div>
 
@@ -166,6 +142,8 @@ const ImageSlider = () => {
                 src={currentSlide.image}
                 alt={currentSlide.title}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                fetchpriority="high"
+                onError={handleImageError}
               />
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />

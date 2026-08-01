@@ -34,7 +34,24 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Middleware
-app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        // Allow images from Cloudinary CDN, Unsplash, and any https source
+        // Fixes images not showing on Render/Production (blocked by default
+        // helmet CSP which only allows img-src 'self' data:)
+        "img-src": ["'self'", "data:", "blob:", "https:", "http:"],
+        "script-src": ["'self'", "https:", "'unsafe-inline'"],
+        "style-src": ["'self'", "https:", "'unsafe-inline'"],
+        "font-src": ["'self'", "https:", "data:"],
+        "connect-src": ["'self'", "https:", "http:"],
+      },
+    },
+  }),
+);
 
 const allowedOrigins = [
   "http://localhost:3000",
